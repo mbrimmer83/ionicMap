@@ -24,7 +24,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     controller: 'AppCtrl'
   })
   .state('app.map', {
-    url: '/search',
+    url: '/map',
     views: {
       'menuContent': {
         templateUrl: 'templates/map.html',
@@ -32,43 +32,44 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     }
   })
-  .state('app.browse', {
-      url: '/browse',
+  .state('app.home', {
+      url: '/home',
       views: {
         'menuContent': {
-          templateUrl: 'templates/browse.html'
+          templateUrl: 'templates/home.html'
         }
       }
     });
-  $urlRouterProvider.otherwise('/app/search');
+  $urlRouterProvider.otherwise('/app/home');
 });
 
-app.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-
-  $scope.loginData = {};
-  $ionicModal.fromTemplateUrl('templates/login.html', {
+app.controller('AppCtrl', function($scope, $ionicModal, $timeout, geoCode) {
+  $scope.markerData = {};
+  $ionicModal.fromTemplateUrl('templates/marker.html', {
     scope: $scope
   }).then(function(modal) {
     $scope.modal = modal;
   });
 
-  $scope.closeLogin = function() {
+  $scope.closeMarker = function() {
     $scope.modal.hide();
   };
 
-  $scope.login = function() {
+  $scope.makeMarker = function() {
     $scope.modal.show();
   };
 
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
+  $scope.doCoords = function() {
+    console.log("Looking up address", $scope.markerData);
     $timeout(function() {
-      $scope.closeLogin();
+      geoCode.getCoords($scope.markerData)
+      $scope.closeMarker();
     }, 1000);
   };
 });
 
 app.service('googleMap', function() {
+  var data ={};
   this.makeMarker = function(coords, map) {
     var marker = new google.maps.Marker({
           position: coords,
@@ -79,14 +80,26 @@ app.service('googleMap', function() {
 });
 
 app.service('geoCode', function() {
-  this.getCoords = function() {
-
+  this.getCoords = function(data) {
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': data.address}, function(results, status) {
+      if (status == 'OK') {
+        var latitude = results[0].geometry.location.lat();
+        var longitude = results[0].geometry.location.lng()
+        console.log(latitude);
+        console.log(longitude);
+      } else {
+        console.log("Geocode was not successful for the following reason: " + status);
+      }
+    });
   };
 });
 
-app.controller('MapController', function($scope, $state, $cordovaGeolocation, googleMap) {
+app.controller('MapController', function($scope, $state, $cordovaGeolocation, googleMap, $ionicLoading) {
+  console.log("MainController is active");
   var coords = {};
   var positionOptions = {timeout: 10000, enableHighAccuracy: true};
+  $ionicLoading.show();
   $cordovaGeolocation.getCurrentPosition(positionOptions)
   .then(function(position) {
     coords = {
@@ -99,8 +112,8 @@ app.controller('MapController', function($scope, $state, $cordovaGeolocation, go
       zoom: 15,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
+    $ionicLoading.hide();
     var map = new google.maps.Map(mapElement, mapOptions);
-    $scope.map = map;
     googleMap.makeMarker(coords, map);
   });
 });
