@@ -85,7 +85,7 @@ app.service('geoCode', function() {
     geocoder.geocode({ 'address': data.address}, function(results, status) {
       if (status == 'OK') {
         var latitude = results[0].geometry.location.lat();
-        var longitude = results[0].geometry.location.lng()
+        var longitude = results[0].geometry.location.lng();
         console.log(latitude);
         console.log(longitude);
       } else {
