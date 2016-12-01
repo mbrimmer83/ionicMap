@@ -46,7 +46,8 @@ app.config(function($stateProvider, $urlRouterProvider) {
 app.controller('AppCtrl', function($scope, $ionicModal, $timeout, geoCode) {
   $scope.markerData = {};
   $ionicModal.fromTemplateUrl('templates/marker.html', {
-    scope: $scope
+    scope: $scope,
+    animation: 'slide-in-down'
   }).then(function(modal) {
     $scope.modal = modal;
   });

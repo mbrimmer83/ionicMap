@@ -7,3 +7,25 @@
     width: 100%;
     height: 100%;
 }
+.slide-in-down {
+  -webkit-transform: translate3d(0, -100%, 0);
+  transform: translate3d(0, -100%, 0);
+}
+
+.slide-in-down.ng-enter, .slide-in-down > .ng-enter {
+  -webkit-transition: all cubic-bezier(.1, .7, .1, 1) 800ms;
+  transition: all cubic-bezier(.1, .7, .1, 1) 800ms;
+}
+
+.slide-in-down.ng-enter-active, .slide-in-down > .ng-enter-active {
+  -webkit-transform: translate3d(0, 43px, 0);
+  transform: translate3d(0, 43px, 0);
+}
+
+.slide-in-down.ng-leave, .slide-in-down > .ng-leave {
+  -webkit-transition: all ease-in-out 800ms;
+  transition: all ease-in-out 800ms;
+}
+.ion-nifty-modal {
+  
+}
